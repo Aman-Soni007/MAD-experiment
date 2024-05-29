@@ -1,0 +1,64 @@
+ Install Flutter SDK
+Download Flutter SDK:
+
+Visit the Flutter website and download the Flutter SDK for your operating system (Windows, macOS, or Linux).
+Extract the Flutter SDK:
+
+Extract the downloaded Flutter SDK zip file to a location on your computer.
+Set up Flutter Path:
+
+Add the Flutter SDK bin directory to your system path. This allows you to run Flutter commands from the command line.
+Example for macOS/Linux:
+bash
+Copy code
+export PATH="$PATH:/path/to/flutter/bin"
+Example for Windows:
+swift
+Copy code
+set PATH="%PATH%;C:\path\to\flutter\bin"
+Verify Flutter Installation:
+
+Open a new terminal window and run flutter doctor. This command checks your Flutter installation and displays a report of any issues.
+Step 2: Install Android Studio (Recommended)
+Download Android Studio:
+
+Visit the Android Studio website and download the latest version of Android Studio for your operating system.
+Install Android Studio:
+
+Follow the installation instructions provided by the Android Studio setup wizard.
+During installation, make sure to select "Android Virtual Device" and "Flutter plugin" for Android Studio.
+Step 3: Configure Android Studio for Flutter
+Install Flutter and Dart Plugins:
+
+Open Android Studio.
+Go to Preferences on macOS or Settings on Windows/Linux.
+Navigate to Plugins and search for "Flutter" and "Dart".
+Install both plugins and restart Android Studio.
+Set Flutter SDK Path:
+
+After restarting Android Studio, go to Preferences/Settings > Languages & Frameworks > Flutter.
+Set the Flutter SDK path to the directory where you extracted the Flutter SDK.
+Step 4: Install Visual Studio Code (Optional)
+Download Visual Studio Code:
+
+Visit the Visual Studio Code website and download the latest version of Visual Studio Code for your operating system.
+Install Flutter and Dart Extensions:
+
+Open Visual Studio Code.
+Go to the Extensions view by clicking on the square icon in the sidebar or by pressing Ctrl+Shift+X.
+Search for "Flutter" and "Dart" extensions and install them.
+Step 5: Set up Android Device or Emulator
+Set up Android Device:
+
+Enable Developer Options on your Android device by tapping the build number multiple times in the device settings.
+Enable USB debugging in the Developer Options.
+Connect your Android device to your computer via USB.
+Set up Android Emulator (AVD):
+
+Open Android Studio.
+Go to Tools > AVD Manager.
+Create a new virtual device by following the instructions provided.
+Step 6: Verify Flutter Installation
+Run Flutter Doctor:
+Open a terminal or command prompt.
+Run flutter doctor. This command checks your Flutter installation and environment setup.
