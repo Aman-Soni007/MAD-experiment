@@ -1,0 +1,121 @@
+dependencies {
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+}
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@drawable/card_background"
+        android:elevation="4dp"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp">
+
+        <ImageView
+            android:id="@+id/profile_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_foreground"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/employee_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Employee Name"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/employee_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Position"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp"
+            android:textColor="#757575" />
+    </LinearLayout>
+
+</RelativeLayout>
+              
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#FFFFFF"/>
+    <corners android:radius="8dp"/>
+</shape>
+
+package com.example.profilecard
+
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.activity_main.*
+
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // URL of the server image
+        val imageUrl = "https://example.com/path/to/your/image.jpg"
+
+        // Load image from server
+        Glide.with(this)
+            .load(imageUrl)
+            .placeholder(R.drawable.ic_launcher_foreground) // optional placeholder
+            .into(profile_image)
+
+        // Set employee details
+        employee_name.text = "John Doe"
+        employee_position.text = "Software Engineer"
+    }
+}
+android {
+    ...
+    viewBinding {
+        enabled = true
+    }
+}
+package com.example.profilecard
+
+import android.os.Bundle
+androidx.appcompat.app.AppCompatActivity
+com.bumptech.glide.Glide
+com.example.profilecard.databinding.ActivityMainBinding
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // URL of the server image
+        val imageUrl = "https://example.com/path/to/your/image.jpg"
+
+        // Load image from server
+        Glide.with(this)
+            .load(imageUrl)
+            .placeholder(R.drawable.ic_launcher_foreground) // optional placeholder
+            .into(binding.profileImage)
+
+        // Set employee details
+        binding.employeeName.text = "John Doe"
+        binding.employeePosition.text = "Software Engineer"
+    }
+}
+
