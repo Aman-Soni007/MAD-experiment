@@ -1,0 +1,204 @@
+dependencies {
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+}
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true" />
+
+    <ImageView
+        android:id="@+id/playIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:src="@drawable/ic_play_circle_filled"
+        android:tint="@android:color/white"/>
+</FrameLayout>
+import android.content.Context;
+import android.net.Uri;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+com.squareup.picasso.Picasso;
+import java.util.List;
+
+public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> {
+    private Context mContext;
+    private List<MediaItem> mMediaList;
+
+    public MediaAdapter(Context context, List<MediaItem> mediaList) {
+        mContext = context;
+        mMediaList = mediaList;
+    }
+
+    @NonNull
+    @Override
+    public MediaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.item_media, parent, false);
+        return new MediaViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull MediaViewHolder holder, int position) {
+        MediaItem mediaItem = mMediaList.get(position);
+        if (mediaItem.isVideo()) {
+            holder.playIcon.setVisibility(View.VISIBLE);
+        } else {
+            holder.playIcon.setVisibility(View.GONE);
+        }
+        Picasso.get().load(mediaItem.getUri()).into(holder.imageView);
+    }
+
+    @Override
+    public int getItemCount() {
+        return mMediaList.size();
+    }
+
+    public class MediaViewHolder extends RecyclerView.ViewHolder {
+        public ImageView imageView;
+        public ImageView playIcon;
+
+        public MediaViewHolder(View itemView) {
+            super(itemView);
+            imageView = itemView.findViewById(R.id.imageView);
+            playIcon = itemView.findViewById(R.id.playIcon);
+        }
+    }
+}
+import android.net.Uri;
+
+public class MediaItem {
+    private Uri uri;
+    private boolean isVideo;
+
+    public MediaItem(Uri uri, boolean isVideo) {
+        this.uri = uri;
+        this.isVideo = isVideo;
+    }
+
+    public Uri getUri() {
+        return uri;
+    }
+
+    public boolean isVideo() {
+        return isVideo;
+    }
+}
+import android.Manifest;
+import android.content.ContentResolver;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_PERMISSIONS = 100;
+    private RecyclerView mRecyclerView;
+    private MediaAdapter mAdapter;
+    private List<MediaItem> mMediaList = new ArrayList<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mRecyclerView = findViewById(R.id.recyclerView);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        mAdapter = new MediaAdapter(this, mMediaList);
+        mRecyclerView.setAdapter(mAdapter);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS);
+        } else {
+            loadMediaFiles();
+        }
+    }
+
+    private void loadMediaFiles() {
+        new Thread(() -> {
+            ContentResolver contentResolver = getContentResolver();
+            Uri imageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            Uri videoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+
+            String[] projection = {MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.SIZE};
+            Cursor imageCursor = contentResolver.query(imageUri, projection, null, null, null);
+            Cursor videoCursor = contentResolver.query(videoUri, projection, null, null, null);
+
+            if (imageCursor != null) {
+                int idColumn = imageCursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID);
+                int dataColumn = imageCursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                int sizeColumn = imageCursor.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE);
+                while (imageCursor.moveToNext()) {
+                    Uri uri = Uri.withAppendedPath(imageUri, imageCursor.getString(idColumn));
+                    long size = imageCursor.getLong(sizeColumn);
+                    mMediaList.add(new MediaItem(uri, false));
+                }
+                imageCursor.close();
+            }
+
+            if (videoCursor != null) {
+                int idColumn = videoCursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID);
+                int dataColumn = videoCursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                int sizeColumn = videoCursor.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE);
+                while (videoCursor.moveToNext()) {
+                    Uri uri = Uri.withAppendedPath(videoUri, videoCursor.getString(idColumn));
+                    long size = videoCursor.getLong(sizeColumn);
+                    mMediaList.add(new MediaItem(uri, true));
+                }
+                videoCursor.close();
+            }
+
+            Collections.sort(mMediaList, (o1, o2) -> {
+                long size1 = o1.isVideo() ? new java.io.File(o1.getUri().getPath()).length() : new java.io.File(o1.getUri().getPath()).length();
+                long size2 = o2.isVideo() ? new java.io.File(o2.getUri().getPath()).length() : new java.io.File(o2.getUri().getPath()).length();
+                return Long.compare(size2, size1);
+            });
+
+            runOnUiThread(() -> mAdapter.notifyDataSetChanged());
+        }).start();
+    }
+
+    @Override
+    public
