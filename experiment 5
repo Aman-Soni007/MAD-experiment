@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+<?xml version="1.0" encoding="utf-8"?>
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/imageView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scaleType="centerCrop"
+    android:adjustViewBounds="true" />
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+com.squareup.picasso.Picasso;
+
+public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
+    private Context mContext;
+    private List<String> mImageUrls;
+
+    public ImageAdapter(Context context, List<String> imageUrls) {
+        mContext = context;
+        mImageUrls = imageUrls;
+    }
+
+    @NonNull
+    @Override
+    public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.item_image, parent, false);
+        return new ImageViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
+        String imageUrl = mImageUrls.get(position);
+        Picasso.get().load(imageUrl).into(holder.imageView);
+    }
+
+    @Override
+    public int getItemCount() {
+        return mImageUrls.size();
+    }
+
+    public class ImageViewHolder extends RecyclerView.ViewHolder {
+        public ImageView imageView;
+
+        public ImageViewHolder(View itemView) {
+            super(itemView);
+            imageView = itemView.findViewById(R.id.imageView);
+        }
+    }
+}
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+java.util.Arrays;
+java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+    private RecyclerView mRecyclerView;
+    private ImageAdapter mAdapter;
+    private List<String> mImageUrls = Arrays.asList(
+        "https://example.com/image1.jpg",
+        "https://example.com/image2.jpg",
+        // Add more image URLs here
+    );
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mRecyclerView = findViewById(R.id.recyclerView);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        mAdapter = new ImageAdapter(this, mImageUrls);
+        mRecyclerView.setAdapter(mAdapter);
+    }
+}
+<uses-permission android:name="android.permission.INTERNET"/>
