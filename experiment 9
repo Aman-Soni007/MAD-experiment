@@ -1,0 +1,66 @@
+flutter create flutter_game
+cd flutter_game
+dependencies:
+  flutter:
+    sdk: flutter
+  flame: ^1.0.0
+import 'package:flame/components.dart';
+import 'package:flame/game.dart';
+import 'package:flame/input.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class SimpleGame extends FlameGame with HasKeyboardHandlerComponents, HasCollisionDetection {
+  late Player player;
+  late double screenWidth;
+  late double screenHeight;
+
+  @override
+  Future<void> onLoad() async {
+    screenWidth = size.x;
+    screenHeight = size.y;
+
+    player = Player()
+      ..position = Vector2(screenWidth / 2, screenHeight - 50)
+      ..anchor = Anchor.center;
+
+    add(player);
+  }
+
+  @override
+  void onPanUpdate(DragUpdateInfo info) {
+    player.position += info.delta.game;
+  }
+
+  @override
+  KeyEventResult onKeyEvent(
+      RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    if (event is RawKeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+        player.position.x -= 10;
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+        player.position.x += 10;
+      }
+    }
+    return KeyEventResult.handled;
+  }
+}
+
+class Player extends SpriteComponent with HasGameRef<SimpleGame> {
+  @override
+  Future<void> onLoad() async {
+    sprite = await gameRef.loadSprite('player.png');
+    size = Vector2(50, 50);
+  }
+}
+import 'package:flutter/material.dart';
+import 'package:flame/game.dart';
+import 'package:flutter_game/game/simple_game.dart';
+
+void main() {
+  runApp(GameWidget(game: SimpleGame()));
+}
+flutter:
+  assets:
+    - assets/player.png
+flutter run
